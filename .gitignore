@@ -143,3 +143,9 @@ cs
 # Test outputs
 test-output.log
 *.test
+
+# Node.js / TypeScript / NestJS
+node_modules/
+dist/
+coverage/
+*.js.map

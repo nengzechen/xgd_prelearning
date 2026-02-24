@@ -1,10 +1,10 @@
-# 用户权限管理系统 - 多框架实现
+# 远程培养计划 - 多框架 Web 开发实践
 
-本仓库包含**两个独立的用户权限管理系统实现**，分别使用不同的Java Web框架构建，用于学习和对比不同框架的设计理念和实现方式。
+本仓库是远程培养计划（第1-8周）的完整学习成果，包含 Java 和 TypeScript 两大技术栈，覆盖 Play Framework、Spring Boot、TypeScript 和 NestJS 框架。
 
 ## 📚 项目简介
 
-### 🔹 [Spring Boot 实现](./spring-boot-demo/)
+### 🔹 [Spring Boot 实现](./spring-boot-demo/)（第1-3周）
 - **框架：** Spring Boot 3.2.1
 - **构建工具：** Maven
 - **特点：**
@@ -14,7 +14,7 @@
   - RESTful API设计
   - H2内存数据库 + MySQL支持
 
-### 🔹 [Play Framework 实现](./play-framework-demo/)
+### 🔹 [Play Framework 实现](./play-framework-demo/)（第2-5周）
 - **框架：** Play Framework 2.9.x + Akka
 - **构建工具：** SBT
 - **特点：**
@@ -25,6 +25,26 @@
   - WebSocket实时通信
   - Ebean + Hibernate JPA双ORM支持
   - 完整的单元测试套件（44个测试）
+
+### 🔹 [TypeScript 转账服务](./typescript-demo/)（第6-7周）
+- **语言：** TypeScript 5.x
+- **构建工具：** npm + ts-node
+- **特点：**
+  - 完整的 TypeScript 类型系统实践
+  - 账户类型（Account）和转账类型（Transfer）定义
+  - 异步转账服务实现（async/await）
+  - 14个单元测试（覆盖率 90%+）
+
+### 🔹 [NestJS RESTful API](./nestjs-demo/)（第8周）
+- **框架：** NestJS 11.x
+- **语言：** TypeScript
+- **特点：**
+  - 模块化架构（UsersModule / HealthModule）
+  - Controller / Service / Module 完整实践
+  - 全局 ValidationPipe（DTO 参数验证）
+  - 全局异常过滤器（统一错误响应）
+  - 全局 Interceptor（统一响应格式 + 请求日志）
+  - 18个单元测试全部通过
 
 ---
 
