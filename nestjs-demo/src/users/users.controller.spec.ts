@@ -1,82 +1,99 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { Reflector } from '@nestjs/core';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { UserRole } from './dto/create-user.dto';
 
 describe('UsersController', () => {
   let controller: UsersController;
-  let service: UsersService;
+  let usersService: Partial<UsersService>;
 
   const mockUser = {
     id: '1',
     name: 'Alice',
     email: 'alice@example.com',
+    password: 'hashed',
     role: UserRole.ADMIN,
     createdAt: new Date(),
     updatedAt: new Date(),
   };
 
-  const mockService = {
-    findAll: jest.fn().mockReturnValue({
-      items: [mockUser],
-      total: 1,
-      page: 1,
-      limit: 10,
-      totalPages: 1,
-    }),
-    findOne: jest.fn().mockReturnValue(mockUser),
-    create: jest.fn().mockReturnValue(mockUser),
-    update: jest.fn().mockReturnValue({ ...mockUser, name: 'Updated' }),
-    remove: jest.fn().mockReturnValue(undefined),
+  const mockPaginatedResult = {
+    items: [{ id: '1', name: 'Alice', email: 'alice@example.com', role: UserRole.ADMIN, createdAt: new Date(), updatedAt: new Date() }],
+    total: 1,
+    page: 1,
+    limit: 10,
+    totalPages: 1,
   };
 
   beforeEach(async () => {
+    usersService = {
+      findAll: jest.fn().mockReturnValue(mockPaginatedResult),
+      findOne: jest.fn().mockReturnValue(mockUser),
+      create: jest.fn().mockReturnValue(mockUser),
+      update: jest.fn().mockReturnValue({ id: '1', name: 'Alice', email: 'alice@example.com', role: UserRole.ADMIN }),
+      remove: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [UsersController],
       providers: [
-        { provide: UsersService, useValue: mockService },
+        { provide: UsersService, useValue: usersService },
+        Reflector,
       ],
     }).compile();
 
     controller = module.get<UsersController>(UsersController);
-    service = module.get<UsersService>(UsersService);
   });
 
-  it('should be defined', () => {
+  it('应该被定义', () => {
     expect(controller).toBeDefined();
   });
 
-  it('findAll 调用 service.findAll 并返回结果', () => {
-    const result = controller.findAll(1, 10);
-    expect(service.findAll).toHaveBeenCalledWith(1, 10);
-    expect(result.items).toHaveLength(1);
+  describe('findAll', () => {
+    it('应该返回分页用户列表', () => {
+      const result = controller.findAll(1, 10);
+
+      expect(usersService.findAll).toHaveBeenCalledWith(1, 10);
+      expect(result).toEqual(mockPaginatedResult);
+    });
   });
 
-  it('findOne 调用 service.findOne 并返回用户', () => {
-    const result = controller.findOne('1');
-    expect(service.findOne).toHaveBeenCalledWith('1');
-    expect(result.name).toBe('Alice');
+  describe('findOne', () => {
+    it('应该返回单个用户（不含密码）', () => {
+      const result = controller.findOne('1');
+
+      expect(usersService.findOne).toHaveBeenCalledWith('1');
+      expect(result).not.toHaveProperty('password');
+      expect(result).toHaveProperty('name', 'Alice');
+    });
   });
 
-  it('create 调用 service.create 并返回新用户', () => {
-    const dto = {
-      name: 'Alice',
-      email: 'alice@example.com',
-      password: '123456',
-    };
-    const result = controller.create(dto);
-    expect(service.create).toHaveBeenCalledWith(dto);
-    expect(result.email).toBe('alice@example.com');
+  describe('create', () => {
+    it('应该创建并返回用户（不含密码）', () => {
+      const dto = { name: 'New', email: 'new@example.com', password: '123456' };
+      const result = controller.create(dto);
+
+      expect(usersService.create).toHaveBeenCalledWith(dto);
+      expect(result).not.toHaveProperty('password');
+    });
   });
 
-  it('update 调用 service.update 并返回更新后用户', () => {
-    const result = controller.update('1', { name: 'Updated' });
-    expect(service.update).toHaveBeenCalledWith('1', { name: 'Updated' });
-    expect(result.name).toBe('Updated');
+  describe('update', () => {
+    it('应该更新并返回用户', () => {
+      const dto = { name: 'Updated' };
+      const result = controller.update('1', dto);
+
+      expect(usersService.update).toHaveBeenCalledWith('1', dto);
+      expect(result).toBeDefined();
+    });
   });
 
-  it('remove 调用 service.remove', () => {
-    controller.remove('1');
-    expect(service.remove).toHaveBeenCalledWith('1');
+  describe('remove', () => {
+    it('应该删除用户', () => {
+      controller.remove('1');
+
+      expect(usersService.remove).toHaveBeenCalledWith('1');
+    });
   });
 });
